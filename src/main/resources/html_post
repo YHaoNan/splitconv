@@ -1,0 +1,56 @@
+            ];
+        }
+
+        function parseLogArray(logArray) {
+            return logArray.map(log => {
+                const regex = />>>(\d+)<<< (.*)/;
+                const matches = log.match(regex);
+                if (matches) {
+                    return {
+                        timestamp: parseInt(matches[1], 10),
+                        logContent: matches[2]
+                    };
+                }
+                return null;
+            }).filter(entry => entry !== null);
+        }
+
+
+        function logts(ts) {
+            return Math.log2((1 + ts)) * 5
+        }
+        let start = 0
+        function createTimeline(logs) {
+            const timelineContainer = document.getElementById('timeline');
+            const maxTimestamp = Math.max(...logs.map(log => log.timestamp));
+            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f39c12', '#e67e22', '#1abc9c'];
+
+            logs.forEach((log, index) => {
+                const prevLog = index !== 0 ? logs[index - 1] : {timestamp: 0}
+                const nextLog = logs[index + 1] ? logs[index + 1] : {timestamp: 0}
+
+                const logEntry = document.createElement('div');
+                logEntry.classList.add('log-entry');
+                logEntry.style.left = `${logts(log.timestamp) + start}px`
+                start += logts(log.timestamp)
+                console.log(log.timestamp)
+                logEntry.style.width = `${logts(nextLog.timestamp)}px`;
+                logEntry.style.top = `${index * 20}px`;
+                logEntry.style.backgroundColor = colors[index % colors.length];
+                logEntry.setAttribute('data-log', log.timestamp + " | " + log.logContent);
+
+                timelineContainer.appendChild(logEntry);
+            });
+
+            // Update container height based on number of logs
+            timelineContainer.style.height = `${logs.length * 20}px`;
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const logs = parseLogArray(getLogArray());
+            createTimeline(logs);
+        });
+    </script>
+</body>
+</html>

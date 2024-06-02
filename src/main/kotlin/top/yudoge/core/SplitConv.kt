@@ -1,5 +1,7 @@
 package top.yudoge.top.yudoge.core
 
+import java.io.Writer
+
 /**
  * SplitConv是一个用于执行文本拆分任务的框架，一个常见的使用场景是日志文件的处理，比如你可能有如下需求：
  *  1. 按照日志文件中每行日志携带的线程名称拆分日志文件成多个文件
@@ -67,12 +69,12 @@ interface SplitConv {
     fun start()
 
     /**
-     * 开始之前的hook
+     * 每一个conv开始之前的hook
      */
-    fun beforeStart(hook: ()->Unit)
+    fun beforeHook(hook: (Writer)->Unit)
 
     /**
-     * 结束之后的hook
+     * 每一个conv结束之后的hook
      */
-    fun endStart(hook: ()->Unit)
+    fun endHook(hook: (Writer)->Unit)
 }

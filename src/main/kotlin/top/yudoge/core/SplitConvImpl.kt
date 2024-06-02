@@ -29,8 +29,8 @@ class SplitConvImpl(
 
     private lateinit var splitf: (SplitConv, Line) -> Unit
     private lateinit var convf: (SplitConv, type: String, lines: Iterator<Line>) -> Unit
-    private var beforeHook: (() -> Unit)? = null
-    private var endHook: (() -> Unit)? = null
+    private var beforeHook: ((Writer) -> Unit)? = null
+    private var endHook: ((Writer) -> Unit)? = null
     private val splitThreads: List<Thread>
     private val splitTaskQueue: BlockingQueue<Line>
     private val tmpFileWriters: MutableMap<String, Writer> = mutableMapOf()
@@ -89,6 +89,7 @@ class SplitConvImpl(
             outFileWriter.put(
                 outFileName, BufferedWriter(FileWriter(File(this.config.outdir, outFileName)), this.config.bufSize)
             )
+            beforeHook?.let { it(outFileWriter[outFileName]!!) }
         }
 
 
@@ -96,23 +97,19 @@ class SplitConvImpl(
     }
 
     override fun start() {
-        // 调用beforeHook
-        this.callBeforeHook()
         // split阶段
         this.splitPhase()
         // 重排序临时分类文件
         this.reorderTmp()
         // conv阶段
         this.convPhase()
-        // 调用endHook
-        this.callEndHook()
     }
 
-    override fun beforeStart(hook: () -> Unit) {
+    override fun beforeHook(hook: (Writer) -> Unit) {
         this.beforeHook = hook
     }
 
-    override fun endStart(hook: () -> Unit) {
+    override fun endHook(hook: (Writer) -> Unit) {
         this.endHook = hook
     }
 
@@ -123,14 +120,14 @@ class SplitConvImpl(
         return sanitizeFilename(type)
     }
 
-    private fun callBeforeHook() {
+    private fun callBeforeHook(writer: Writer) {
         log.debug("[BeforeHook] start...")
-        if (this.beforeHook != null) this.beforeHook!!()
+        if (this.beforeHook != null) this.beforeHook!!(writer)
         log.debug("[BeforeHook] end...")
     }
-    private fun callEndHook() {
+    private fun callEndHook(writer: Writer) {
         log.debug("[EndHook] start...")
-        if (this.endHook != null) this.endHook!!()
+        if (this.endHook != null) this.endHook!!(writer)
         log.debug("[EndHook] end...")
     }
 
@@ -212,6 +209,8 @@ class SplitConvImpl(
         }
 
         for (wr in outFileWriter) {
+            callEndHook(wr.value)
+            wr.value.flush()
             wr.value.close()
         }
     }
