@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Timeline</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,6 +39,7 @@
 </head>
 <body>
     <h1>Log Timeline</h1>
+    <p>Log Timeline基于一系列日志行生成，描述的是当前日志行到下一个日志行之间的时间间隔，所以仅供一个快速参考，并不一定代表该条日志的实际真实执行时间。中间的断开可能是有间隔时间为0的行。Timeline宽度为与下一条日志时间差的对数函数 <em>Math.log2((1 + interval)) * 5</em>。<strong>点击即可复制日志行</strong>。</p>
     <div class="timeline-container" id="timeline"></div>
 
     <script>

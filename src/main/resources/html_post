@@ -37,7 +37,26 @@
                 logEntry.style.width = `${logts(nextLog.timestamp)}px`;
                 logEntry.style.top = `${index * 20}px`;
                 logEntry.style.backgroundColor = colors[index % colors.length];
-                logEntry.setAttribute('data-log', log.timestamp + " | " + log.logContent);
+                logEntry.setAttribute('data-log', nextLog.timestamp + " | " + log.logContent);
+
+
+                logEntry.id = 'logentry_' + index
+
+                var clipboard = new ClipboardJS("#"+'logentry_'+index, {
+                    text: function () {
+                        return `第 ${index} 行   ${nextLog.timestamp} ${log.logContent}`;
+                    },
+                });
+
+                clipboard.on('success', function(e) {
+                      alert('该条日志已复制到剪贴板')
+
+                      e.clearSelection();
+                });
+
+                clipboard.on('error', function(e) {
+                      alert('复制日志到剪贴板失败')
+                });
 
                 timelineContainer.appendChild(logEntry);
             });

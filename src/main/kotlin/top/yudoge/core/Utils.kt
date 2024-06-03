@@ -1,5 +1,6 @@
 package top.yudoge.top.yudoge.core
 
+import java.io.Writer
 import java.security.MessageDigest
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -39,4 +40,20 @@ fun extractTime(input: String): LocalDateTime? {
         return time
     } catch (e: Exception) { }
     return null
+}
+
+fun runSplitConv(
+    inputFile: String,
+    splitf: (SplitConv, Line) -> Unit,
+    convf: (SplitConv, type: String, lines: Iterator<Line>) -> Unit,
+    config: Config = Config.defaultConfig(),
+    beforeHook: ((Writer) -> Unit)? = null,
+    endHook: ((Writer) -> Unit)? = null
+) {
+    val sc = SplitConvImpl(inputFile, config)
+    sc.setup(splitf, convf)
+    beforeHook?.let { sc.beforeHook(it) }
+    endHook?.let { sc.endHook(it) }
+
+    sc.start()
 }
