@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter
  * SplitConvert概念、使用方法，详见 top.yudoge.core.SplitConv
  */
 fun main() {
-    val logFile = "C:\\Users\\15941\\Downloads\\all.log"
+    val logFile = "D:\\logs\\updatespecial.log"
 
     // 第一个SplitConv任务，输出文本格式的日志文件
     runSplitConv(
@@ -31,6 +31,9 @@ fun main() {
         convf = ::convfHtml,
         beforeHook = writeClassPathFileHook("html_pre"),
         endHook = writeClassPathFileHook("html_post"),
+        config = Config.Builder()
+            .recreateDir(false)
+            .build()
     )
 
 }
@@ -38,6 +41,10 @@ fun main() {
 fun splitf(sc: SplitConv, line: Line) {
     // 提取日志行中的线程名称，并以线程名分类
     val threadName = extractThreadName(line.content)
+    val time = extractTime(line.content)
+    if (time != null && time.isBefore("2024-06-03 11:25:20")) {
+        return
+    }
     // 只有那些具有线程名并且线程名以http-nio开头的被发射到conv阶段
     // 带来的效果就是没有被发射那些都被过滤掉了
     if (threadName != null && threadName.startsWith("http-nio")) {

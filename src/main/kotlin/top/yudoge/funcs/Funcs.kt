@@ -21,3 +21,4 @@ fun convByPrevLine(lines: Iterator<Line>, lineHandler: (prev: Line?, cur: Line) 
         prevLine = line
     }
 }
+

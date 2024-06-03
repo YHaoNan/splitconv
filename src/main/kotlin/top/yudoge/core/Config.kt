@@ -9,7 +9,8 @@ data class Config(
     // 正在排队的split任务大小。当用户的splitf过重时，有可能有splitf的执行跟不上文件行的读取，当内存中排队的splitf
     // 到达此数量，此时就让读文件的线程阻塞一会儿
     val queueSplitTaskSize: Int,
-    val hashedTmpFileName: Boolean
+    val hashedTmpFileName: Boolean,
+    val recreateDir: Boolean
 ) {
 
 
@@ -21,6 +22,7 @@ data class Config(
         private var bufSize: Int? = null
         private var queueSplitTaskSize: Int? = null
         private var hashedTmpFileName: Boolean? = null
+        private var recreateDir: Boolean? = null
 
         fun threads(threads: Int): Builder {
             this.threads = threads
@@ -57,6 +59,11 @@ data class Config(
             return this
         }
 
+        fun recreateDir(recreateDir: Boolean): Builder {
+            this.recreateDir = recreateDir
+            return this
+        }
+
         fun build(): Config {
             val default = defaultConfig()
             return Config(
@@ -67,6 +74,7 @@ data class Config(
                 if (bufSize == null) default.bufSize else bufSize!!,
                 if (queueSplitTaskSize == null) default.queueSplitTaskSize else queueSplitTaskSize!!,
                 if (hashedTmpFileName == null) default.hashedTmpFileName else hashedTmpFileName!!,
+                if (recreateDir == null) default.recreateDir else recreateDir!!
             )
         }
     }
@@ -82,7 +90,8 @@ data class Config(
                 // buffer大小1MB
                 1024 * 1024,
                 1000,
-                false
+                false,
+                true
             )
         }
 

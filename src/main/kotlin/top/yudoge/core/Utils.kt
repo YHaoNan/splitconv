@@ -42,6 +42,22 @@ fun extractTime(input: String): LocalDateTime? {
     return null
 }
 
+fun LocalDateTime.isBefore(
+    timeStr: String,
+    formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+): Boolean {
+    var date = formatter.parse(timeStr, LocalDateTime::from)
+    return this.isBefore(date)
+}
+
+fun LocalDateTime.isAfter(
+    timeStr: String,
+    formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+): Boolean {
+    var date = formatter.parse(timeStr, LocalDateTime::from)
+    return this.isAfter(date)
+}
+
 fun runSplitConv(
     inputFile: String,
     splitf: (SplitConv, Line) -> Unit,
@@ -57,3 +73,4 @@ fun runSplitConv(
 
     sc.start()
 }
+

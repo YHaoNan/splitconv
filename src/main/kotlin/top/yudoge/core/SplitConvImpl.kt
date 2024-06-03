@@ -89,7 +89,7 @@ class SplitConvImpl(
             outFileWriter.put(
                 outFileName, BufferedWriter(FileWriter(File(this.config.outdir, outFileName)), this.config.bufSize)
             )
-            beforeHook?.let { it(outFileWriter[outFileName]!!) }
+            callBeforeHook(outFileWriter[outFileName]!!)
         }
 
 
@@ -97,6 +97,7 @@ class SplitConvImpl(
     }
 
     override fun start() {
+        this.recreateDir()
         // split阶段
         this.splitPhase()
         // 重排序临时分类文件
@@ -213,6 +214,19 @@ class SplitConvImpl(
             wr.value.flush()
             wr.value.close()
         }
+    }
+
+    private fun recreateDir() {
+        if (!this.config.recreateDir) return
+        if (File(this.config.outdir).exists()) {
+            File(this.config.outdir).deleteRecursively()
+        }
+        File(this.config.outdir).mkdirs()
+
+        if (File(this.config.tmpdir).exists()) {
+            File(this.config.tmpdir).deleteRecursively()
+        }
+        File(this.config.tmpdir).mkdirs()
     }
 
 
